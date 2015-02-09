@@ -26,7 +26,7 @@ public class UpdateView extends BroadcastReceiver {
         // an Intent broadcast.
 
         if(mTask.getStatus() != AsyncTask.Status.RUNNING){
-            mTask = new GetLyrics(myActivity,context,in);
+            mTask = new GetLyrics(context,in);
             mTask.execute();
         }
     }

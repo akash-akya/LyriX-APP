@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="5dp"
+    android:paddingLeft="3dp"
+    android:paddingRight="3dp"
     android:paddingTop="6dp"
     android:paddingBottom="0dp"
     tools:context=".show">
@@ -21,8 +21,10 @@
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/button"
-        android:id="@+id/scrollView">
+        android:id="@+id/scrollView"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true">
 
     <TextView
         android:layout_width="match_parent"
@@ -32,9 +34,9 @@
         android:gravity="center_horizontal"
         android:textIsSelectable="true"
         android:background="@null"
-        android:paddingTop="?android:attr/actionBarSize"
+        android:paddingTop="?attr/actionBarSize"
         android:minHeight="150dp"
-        android:visibility="gone"
+        android:paddingBottom="30dp"
         android:textSize="19sp" />
 
     </ScrollView>
@@ -52,9 +54,10 @@
         android:gravity="center_horizontal"
         android:inputType="textMultiLine"
         android:textIsSelectable="true"
-        android:paddingTop="?android:attr/actionBarSize"
+        android:paddingTop="?attr/actionBarSize"
+        android:background="@android:color/transparent"
         android:minHeight="150dp"
-        android:visibility="gone" />
+        android:textSize="19sp" />
     </ScrollView>
 
     <Button
@@ -65,37 +68,28 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-
         android:visibility="gone" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SEARCH"
-        android:id="@+id/button4"
-        android:visibility="gone"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar2"
+            android:indeterminate="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fetching lyrics, please wait."
+            android:id="@+id/textView9"
+            android:layout_marginTop="25dp"
+            android:textSize="19sp" />
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:indeterminate="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fetching lyrics, please wait."
-        android:id="@+id/textView8"
-        android:textSize="22sp"
-        android:layout_above="@+id/progressBar"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="62dp" />
-
+    </LinearLayout>
 
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 
@@ -39,7 +40,6 @@ public class MyReceiver extends BroadcastReceiver {
             mEditor.commit();
 
             intent.putExtra("searched",false);
-
             intent.putExtra("store", true);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -93,7 +93,11 @@ public class MyReceiver extends BroadcastReceiver {
 
 
         mypref = context.getSharedPreferences(show.PREF_NAME, Context.MODE_PRIVATE);
-        if(mypref.getBoolean("hide_notification",false))
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+
+
+
+        if(!settings.getBoolean("notifications_new_message",false))
             return;
 
         if(in.getAction().equals(music_state)){

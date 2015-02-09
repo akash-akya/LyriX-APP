@@ -7,13 +7,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -30,24 +35,26 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
-        mySharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        if(mySharedPref.contains("theme")) {
-            if (mySharedPref.getString("theme", "light").equals("dark")) {
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        if(settings.contains("example_list")) {
+            if (settings.getString("example_list", "0").equals("0")) {
                 setTheme(R.style.AppTheme2);
             } else {
                 setTheme(R.style.AppTheme);
             }
         }
 
-        super.onCreate(savedInstanceState);
+          super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_show);
 
+        mySharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         artist = (EditText) findViewById(R.id.editText);
         track = (EditText) findViewById(R.id.editText2);
         search = (Button) findViewById(R.id.button2);
 
-
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final AlertDialog.Builder mWarning = new AlertDialog.Builder(this);
         mWarning.setTitle("Empty field");
@@ -95,8 +102,49 @@ public class MainActivity extends ActionBarActivity {
         });
 
 
+
+        artist.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                                          KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    try{
+                    if(track.getText().toString().length() != 0){
+
+                        Intent intent = new Intent(MainActivity.this, show.class);
+
+                        if(artist.getText().toString().length() != 0) {
+                            intent.putExtra("artist", artist.getText().toString());
+                        } else {
+                            intent.putExtra("artist", "");
+                        }
+
+
+                        intent.putExtra("track", track.getText().toString());
+                        intent.putExtra("album", "");
+                        intent.putExtra("store",false);
+
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("searched",true);
+                        startActivity(intent);
+                    }  else {
+                        mWarning.show();
+                    }
+                } catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+
+                return true;
+                }
+                return false;
+            }
+        });
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 //        getSupportActionBar().hide();
-        setTitle("Lyrics Finder");
+        setTitle(R.string.app_name);
 
     }
 
@@ -106,7 +154,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-
 
 
 
@@ -120,11 +167,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
-        if(mySharedPref.getBoolean("hide_notification",false)) {
-            menu.findItem(R.id.item2).setTitle("Show Notification");
-        }else {
-            menu.findItem(R.id.item2).setTitle("Hide Notification");
-        }
 //        menu.findItem(R.id.item1).setEnabled(true);
         return true;
     }
@@ -133,24 +175,27 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int noteId=1232;
         switch (item.getItemId()) {
-            case R.id.item1:
-                Intent in = new Intent(this, AboutApp.class);
-                startActivity(in);
+            case android.R.id.home:
+                this.finish();
                 return true;
 
-            case R.id.item2:
-                SharedPreferences.Editor ed = mySharedPref.edit();
-                if(mySharedPref.getBoolean("hide_notification",false)) {
-                    ed.putBoolean("hide_notification", false);
+            case R.id.exit:
+                if(getCurrentFocus()!=null) {
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                 }
-                else {
-                    ed.putBoolean("hide_notification", true);
-                     NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancel(noteId);
-                }
-                ed.apply();
+                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(noteId);
 
+                finish();
+                System.exit(0);
                 return true;
+
+            case R.id.menu_settings:
+                Intent intent = new Intent(this,SettingsActivity.class);
+                startActivity(intent);
+                return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);

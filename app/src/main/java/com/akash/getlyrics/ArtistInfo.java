@@ -1,9 +1,12 @@
 package com.akash.getlyrics;
 
 
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -12,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -40,9 +44,10 @@ public class ArtistInfo extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        mySharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        if(mySharedPref.contains("theme")) {
-            if (mySharedPref.getString("theme", "light").equals("dark")) {
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        if(settings.contains("example_list")) {
+            if (settings.getString("example_list", "0").equals("0")) {
                 setTheme(R.style.AppTheme2);
             } else {
                 setTheme(R.style.AppTheme);
@@ -50,18 +55,21 @@ public class ArtistInfo extends ActionBarActivity {
         }
 
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_artist_info);
+
+        mySharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        SharedPreferences mLyricsDb = getSharedPreferences("LYRICS_DB", Context.MODE_PRIVATE);
         mResult = (TextView) findViewById(R.id.textView_artist_info);
         mResult.setClickable(true);
         mResult.setMovementMethod(LinkMovementMethod.getInstance());
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar2);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         setTitle("Artist Information");
 
 //        Log.w("Artist","main");
-        artist = show.mArtist;
+        artist = mLyricsDb.getString(show.SONGHASH+".ArtistNameCorrected",show.mArtistCorrected);
         mHtmlStart = "<a href='";
         mHtmlEnd = "</a>";
         new GetArtistInfo().execute();
@@ -81,17 +89,25 @@ public class ArtistInfo extends ActionBarActivity {
         List<String> nurls;
         Document document;
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            findViewById(R.id.textView8).setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.VISIBLE);
+            mResult.setVisibility(View.GONE);
+
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
 
-            try {
-                artist = correctTag(artist);
-            } catch (NullPointerException e){
-                lyrics = "Artist field is empty.";
-                e.printStackTrace();
-                return null;
-            }
+//            try {
+//                artist = correctTag(artist);
+//            } catch (NullPointerException e){
+//                lyrics = "Artist field is empty.";
+//                e.printStackTrace();
+//                return null;
+//            }
 
             try {
                 search_item = URLEncoder.encode(artist, "utf-8");
@@ -213,8 +229,9 @@ public class ArtistInfo extends ActionBarActivity {
         @Override
         protected void onPostExecute(Void result) {
 
-            setTitle(show.mArtist);
+            setTitle(artist);
             mProgressBar.setVisibility(View.GONE);
+            findViewById(R.id.textView8).setVisibility(View.GONE);
             mResult.setVisibility(View.VISIBLE);
             if(lyrics.length()==0){
                 lyrics = "Can not find the information";
@@ -237,12 +254,30 @@ public class ArtistInfo extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
+        int noteId=1232;
+        switch (item.getItemId()) {
+
+            case R.id.exit:
+                if(getCurrentFocus()!=null) {
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+                NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(noteId);
+
+                finish();
+                System.exit(0);
+                return true;
+
+            case R.id.menu_settings:
+                Intent intent = new Intent(this,SettingsActivity.class);
+                startActivity(intent);
+                return true;
+
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }

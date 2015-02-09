@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import org.jsoup.Jsoup;
@@ -15,10 +16,12 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -39,14 +42,11 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
     SharedPreferences.Editor mLyricsEditor;
 
 
-
-
-    GetLyrics(show activity,Context context, Intent intent){
+    GetLyrics(Context context, Intent intent){
         this.intent = intent;
         this.context = context;
-        this.myShow = activity;
+        this.myShow = (show) context;
         mNoConnection = false;
-
 
     }
 
@@ -59,7 +59,7 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
         mLyricsDb = context.getSharedPreferences("LYRICS_DB", Context.MODE_PRIVATE);
         mLyricsEditor = mLyricsDb.edit();
 
-        String cachedArtist = intent.getStringExtra("cahcedArtist");
+        String cachedArtist = intent.getStringExtra("cachedArtist");
         String cachedTrack= intent.getStringExtra("cachedTrack");
 
 
@@ -73,30 +73,27 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
         } else {
             this.cancel(true);
         }
+//
+//        if(cachedArtist != null && cachedTrack != null){
+//            if(cachedArtist.equals(artist) && cachedTrack.equals(track)){
+//                this.cancel(true);
+//            }
+//        }
 
-        if(cachedArtist != null && cachedTrack != null){
-            if(cachedArtist.equals(artist) && cachedTrack.equals(track)){
-                this.cancel(true);
-            }
-        }
-
-        intent.putExtra("cahcedArtist",artist);
-        intent.putExtra("cahcedTrack",track);
+        intent.putExtra("cachedArtist",artist);
+        intent.putExtra("cachedTrack",track);
 
         myShow.mLyrics.setVisibility(View.GONE);
         myShow.fail.setVisibility(View.GONE);
-        myShow.google.setVisibility(View.GONE);
-        myShow.editBox.setVisibility(View.GONE);
         myShow.progress.setVisibility(View.VISIBLE);
 
-
+        show.mAsyncTaskRunning = true;
 
     }
 
     @Override
     protected Void doInBackground(Void... params) {
 
-        show.mArtist = artist;
         String mURLprefix = " -youtube.com ";
         String wikia = "lyrics.wikia";
         String azlyric = "azlyrics";
@@ -109,15 +106,16 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
         String lyricsastra = "lyrics.astraweb";
         String songlyrics = "songlyrics";
 
-        lyrics = mLyricsDb.getString(show.getHash(artist,track),"");
+        lyrics = mLyricsDb.getString(show.SONGHASH,"");
+        show.mArtistCorrected = mLyricsDb.getString(show.SONGHASH+".ArtistNameCorrected",artist);
 
         if (lyrics.length()==0) {
             try {
-
                 artist = correctTag(artist);
                 track = correctTag(track);
                 album = correctTag(album);
-                show.mArtist = artist;
+                show.mArtistCorrected = artist;
+
                 lyrics="";
 
                 String item = mURLprefix + artist + " " + track + " lyrics";
@@ -147,7 +145,7 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
 
                         if (iUrl.contains(azlyric)) {
                             lyrics = fetchLyrics(iUrl, "div[style=margin-left:10px;margin-right:10px;]");
-                            Log.w("LyricsApp", "lyrics : "+lyrics);
+//                            Log.w("LyricsApp", "lyrics : "+lyrics);
                             Log.w("LyricsApp", "in azlyric");
                             if (lyrics.length() != 0)
                                 break;
@@ -323,15 +321,7 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
                         break;
                 }
 
-                if (lyrics.length() != 0 && !myShow.mSearched ) {
-                    if (intent.getBooleanExtra("store", false)) {
-                        artist = intent.getStringExtra("artist");
-                        track = intent.getStringExtra("track");
-                        mLyricsEditor.putString(show.getHash(artist,track),lyrics);
-                        mLyricsEditor.commit();
 
-                    }
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -349,14 +339,10 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
 //        art = art.replaceAll(" remix | original mix | mix | radio edit ","").replaceAll("www.* ","");
         tag = tag.replaceAll("_"," ");
 
-
-
-
         tag=tag.toLowerCase();
         for(String str : remove){
             tag = tag.replaceAll(str,"");
         }
-
 
 
         int startIndex = tag.indexOf("(");
@@ -372,7 +358,7 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
 
     }
 
-    /////////////////////search v2
+    /////////////////////search v2/////////////////////////////////////
 
     private List<String> searchv2(String sitem) throws IOException{
 
@@ -390,11 +376,10 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
                     //.referrer("https://www.google.com")
                     .get();
             links = document.select("h3[class=r] a:not(google)");
-        }catch (UnknownHostException e){
+        } catch (UnknownHostException e){
             mNoConnection = true;
             return null;
         }
-
 
 
         for ( Element link : links) {
@@ -403,8 +388,6 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
 
         return urls;
     }
-
-    /////////////////////
 
     private String fetchLyrics(String iUrl, String element) {
         Document document = null;
@@ -430,25 +413,40 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
 
             document.outputSettings(new Document.OutputSettings().prettyPrint(false));
 
-//            document.select("br").append("\\n");
+//            document.html(document.html().replaceAll("(\\r\\n|\\n)", "<br />"));
+
+            document.select("br").append("b2nl");
             document.select("p").prepend("\\n\\n");
 
             Elements elements = document.select(element);
+//            elements.html(elements.html().replaceAll("(\r\n|\n)", "\\n"));
 
             if(elements.isEmpty()){
                 lyrics="";
                 return lyrics;
             }else {
-                lyrics = elements.html().replaceAll("\\\\n", "\n");
+                lyrics = elements.html().replace("b2nl\n", "");
+                lyrics = lyrics.replace("b2nl", "\n");
+                lyrics = lyrics.replaceAll("\\\\n", "\n");
+//                lyrics = elements.html().replaceAll("\\n\\n\\n+", "\n\n");
                 lyrics = Jsoup.clean(lyrics, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
             }
+        } catch (SocketTimeoutException e){
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        lyrics = lyrics.replaceAll("&nbsp;","").trim();
         return lyrics;
 
     }
 
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
+
+    }
 
     @Override
     protected void onPostExecute(Void result) {
@@ -456,19 +454,29 @@ public class GetLyrics  extends AsyncTask<Void, Void, Void> {
 
         if(mNoConnection) {
             lyrics = "No Internet connection";
+        } else if (lyrics.length() != 0) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+            if (settings.getBoolean("auto_save", true) || !intent.getBooleanExtra("searched", false)) {
+
+                artist = intent.getStringExtra("artist");
+                track = intent.getStringExtra("track");
+                mLyricsEditor.putString(show.SONGHASH,lyrics);
+                mLyricsEditor.putString(show.SONGHASH+".ArtistNameCorrected",show.mArtistCorrected);
+                mLyricsEditor.commit();
+            }
         }
 
         try {
-//                mProgressDialog.dismiss();
             myShow.mAfterFetch(lyrics, artist, track, id);
         }catch (NullPointerException e){
             e.printStackTrace();
         }
 
-//            mProgressDialog.dismiss();
-
+        myShow.mLyrics.setVisibility(View.VISIBLE);
         myShow.progress.setVisibility(View.GONE);
         myShow.fetch.setVisibility(View.GONE);
+
+        show.mAsyncTaskRunning = false;
     }
 
 }
