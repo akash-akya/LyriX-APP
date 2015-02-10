@@ -6,7 +6,7 @@ _Apps receiver recognize the music players state and show the notification accor
 ###Features
   - Recognizes the currently playing song to fetch the lyrics
   - App fetches lyrics from more then **20 sites**
-  - _Intelligent tags correcting_ feature (fixes improper tags like **WWW.*** in track name)
+  - _Intelligent tags correcting_ feature _(fixes improper tags like WWW.* in track name)_
   - Support more then **21 Music players**
   - Lyrics can be fetched _manually_ by entering track name and artist name
   - _Offline_ support
