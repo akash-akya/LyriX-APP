@@ -3,6 +3,8 @@ _This app aims to provide effortless lyrics syncing and managing feature to almo
 
 _Apps receiver recognize the music players state and show the notification accordingly. user can press the notification to fetch the lyrics._
 
+![alt text](https://github.com/akash-akya/LyriX-APP/blob/master/banner.jpg "Logo Title Text 1")
+
 ###Features
   - Recognizes the currently playing song to fetch the lyrics
   - App fetches lyrics from more then **20 sites**
