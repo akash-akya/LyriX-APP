@@ -1,9 +1,9 @@
-# LyriX
+## LyriX
 _This app aims to provide effortless lyrics syncing and managing feature to almost all android music players (currently support more then 10 players)._
 
-_Apps receiver recognize the music players state and show the notification accordingly. user can press the notification to fetch the lyrics. _
+_Apps receiver recognize the music players state and show the notification accordingly. user can press the notification to fetch the lyrics._
 
-#Features
+###Features
   - Recognizes the currently playing song to fetch the lyrics
   - App fetches lyrics from more then **20 sites**
   - _Intelligent tags correcting_ feature (fixes improper tags like **WWW.*** in track name)
@@ -23,7 +23,7 @@ _Apps receiver recognize the music players state and show the notification accor
 **Currently app support android version > 4.0 (Icecream sandwich) Lollipop is not supported.**
 
 
-# TO-DO
+### TO-DO
 - Add Lollipop support
 - Optimize lyrics search method
 - Improve interface
@@ -31,10 +31,10 @@ _Apps receiver recognize the music players state and show the notification accor
 - Add more websites
  
 
-## Libraries used
+### Libraries used
 - [Jsoup]
 
-## License
+### License
 
     LyriX android application which fetches lyrics for songs stored in phone.
     Copyright (C) 2015 Akash Hiremath 
