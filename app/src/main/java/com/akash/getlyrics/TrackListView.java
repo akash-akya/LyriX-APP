@@ -44,11 +44,7 @@ public class TrackListView extends ActionBarActivity {
     SharedPreferences mySharedPref;
     public static String PREF_NAME = "MYPREF";
     MusicListAdapter adapter;
-//    ArrayAdapter<String> adapterFilter;
-//    List<String> mDisplayName;
-//    List<String> mFilter;
-//    List<String> mArtist;
-//    List<String> mTrack;
+
     ArrayList<MusicModel> musicDB = new ArrayList<MusicModel>();
 
 
