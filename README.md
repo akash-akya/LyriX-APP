@@ -1,5 +1,5 @@
 ## LyriX
-_This app aims to provide effortless syncing and managing facility of the lyrics to almost all android music players (currently support more then 10 players)._
+_This app aims to provide effortless syncing and managing facility of the lyrics to almost all android music players (currently support more than 10 players)._
 
 _Apps receiver recognize the music players state and show the notification accordingly. user can press the notification to fetch the lyrics._
 
