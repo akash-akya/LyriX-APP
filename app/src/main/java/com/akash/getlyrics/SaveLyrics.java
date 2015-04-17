@@ -23,7 +23,6 @@ public class SaveLyrics extends AlertDialog.Builder {
         this.track = track;
         this.id = id;
 
-
         this.setTitle("Save lyrics...");
 
         // Setting Dialog Message
@@ -31,7 +30,6 @@ public class SaveLyrics extends AlertDialog.Builder {
 
         // Setting Icon to Dialog
         this.setIcon(R.drawable.ic_action_save);
-
 
         mySharedPref = context.getSharedPreferences("MYPREF", Context.MODE_PRIVATE);
         mLyricsDb = context.getSharedPreferences("LYRICS_DB", Context.MODE_PRIVATE);
