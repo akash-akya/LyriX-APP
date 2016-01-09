@@ -1,13 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="3dp"
-    android:paddingRight="3dp"
+    android:paddingLeft="1dp"
+    android:paddingRight="1dp"
     android:paddingTop="6dp"
     android:paddingBottom="0dp"
     tools:context=".show">
-
-
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -17,49 +17,49 @@
         android:gravity="center"
         android:textStyle="italic"
         android:textSize="20sp" />
-
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/scrollView"
-        android:layout_below="@+id/textView2"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:layout_marginRight="0dp"
+        android:id="@+id/scrollView">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:id="@+id/textView"
-        android:gravity="center_horizontal"
-        android:textIsSelectable="true"
-        android:background="@null"
-        android:paddingTop="?attr/actionBarSize"
-        android:minHeight="150dp"
-        android:paddingBottom="30dp"
-        android:textSize="19sp" />
-
+        <!--<WebView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/webView"-->
+            <!--android:textAlignment="center" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:paddingRight="10dp"
+            android:paddingLeft="2dp"
+            android:id="@+id/textView"
+            android:gravity="center_horizontal"
+            android:textIsSelectable="true"
+            android:paddingBottom="20dp"
+            android:textSize="18sp" />
     </ScrollView>
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/button"
         android:visibility="gone"
         android:id="@+id/scrollView2">
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText3"
-        android:text=""
-        android:gravity="center_horizontal"
-        android:inputType="textMultiLine"
-        android:textIsSelectable="true"
-        android:paddingTop="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        android:minHeight="150dp"
-        android:textSize="19sp" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText3"
+            android:text=""
+            android:gravity="center_horizontal"
+            android:inputType="textMultiLine"
+            android:textIsSelectable="true"
+            android:paddingRight="10dp"
+            android:paddingTop="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            android:textSize="19sp" />
     </ScrollView>
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,27 +69,18 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:visibility="gone" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical">
-
+        android:orientation="vertical"
+        android:clickable="false">
         <ProgressBar
-            style="?android:attr/progressBarStyle"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/progressBar2"
             android:indeterminate="true" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fetching lyrics, please wait."
-            android:id="@+id/textView9"
-            android:layout_marginTop="25dp"
-            android:textSize="19sp" />
-
     </LinearLayout>
 
 </RelativeLayout>

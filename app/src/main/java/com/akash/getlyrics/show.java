@@ -15,6 +15,7 @@ import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -26,6 +27,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -34,16 +36,15 @@ import android.widget.TextView;
 
 
 public class show extends ActionBarActivity {
-
     String artist, track, lyrics;
     int noteId=1232;
-
     TextView mLyrics;
     EditText editBox;
-    TextView fail,fetch;
+    TextView fail;
+    WebView webView;
     Button mButtonDone;
     String id;
-    private ActionBar mActionBar;
+//    private ActionBar mActionBar;
     ScrollView mScrollerEdit;
     public static String PREF_NAME = "MYPREF";
     SharedPreferences mySharedPref;
@@ -75,31 +76,22 @@ public class show extends ActionBarActivity {
             }
         }
 
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mySharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-
-
         mSearched = getIntent().getBooleanExtra("searched", false);
         mArtistCorrected = "";
         starterIntent = getIntent();
         mLyricsDb = getSharedPreferences("LYRICS_DB", Context.MODE_PRIVATE);
         mLyricsEditor = mLyricsDb.edit();
-
         mButtonDone = (Button) findViewById(R.id.button);
         fail = (TextView) findViewById(R.id.textView2);
         mLyrics = (TextView) findViewById(R.id.textView);
         editBox = (EditText) findViewById(R.id.editText3);
+        mScrollerEdit = (ScrollView) findViewById(R.id.scrollView2);
         progress = (ProgressBar) findViewById(R.id.progressBar2);
-        fetch = (TextView) findViewById(R.id.textView9);
-        final TypedArray styledAttributes = getTheme().obtainStyledAttributes(
-        new int[] { android.R.attr.actionBarSize });
-        final float mActionBarHeight = styledAttributes.getDimension(0, 0)/4;
 
-
-//        progress.setVisibility(View.VISIBLE);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Bundle extras = getIntent().getExtras();
@@ -109,14 +101,10 @@ public class show extends ActionBarActivity {
         }
         setHash(artist,track);
 
-
-
-
         mButtonDone.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-//                lockUnlock(true,editBox.getText().toString());
                 if(getCurrentFocus()!=null) {
                     InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
@@ -128,14 +116,13 @@ public class show extends ActionBarActivity {
                 mLyricsDb.getString(SONGHASH,"");
 
                 mLyricsEditor.putString(SONGHASH,lyrics);
-
                 mLyricsEditor.commit();
 
                 mLyrics.setVisibility(View.VISIBLE);
                 mScrollerEdit.setVisibility(View.GONE);
                 mButtonDone.setVisibility(View.GONE);
 
-                getSupportActionBar().show();
+//                getSupportActionBar().show();
 
             }
         });
@@ -155,50 +142,7 @@ public class show extends ActionBarActivity {
             }
         });
 
-
-        styledAttributes.recycle();
-        mActionBar = getSupportActionBar();
-
-        final ScrollView mScrollView = (ScrollView) findViewById(R.id.scrollView);
-        mScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-
-            float dy = 0;
-            float mPrevDy = 0;
-
-            @Override
-            public void onScrollChanged() {
-                dy = findViewById(R.id.scrollView).getScrollY();
-
-                if (dy > mPrevDy+mActionBarHeight && mActionBar.isShowing()) {
-                    mActionBar.hide();
-                } else if ((dy < mPrevDy-mActionBarHeight ) && !mActionBar.isShowing()) {
-                    mActionBar.show();
-                }
-                mPrevDy = dy;
-            }
-        });
-
-        mScrollerEdit = (ScrollView) findViewById(R.id.scrollView2);
-        mScrollerEdit.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-
-            float dy = 0;
-            float mPrevDy = 0;
-
-            @Override
-            public void onScrollChanged() {
-                dy = findViewById(R.id.scrollView2).getScrollY();
-
-                if (dy > mPrevDy+mActionBarHeight && mActionBar.isShowing()) {
-                    mActionBar.hide();
-                } else if ((dy < mPrevDy-mActionBarHeight ) && !mActionBar.isShowing()) {
-                    mActionBar.show();
-                }
-                mPrevDy = dy;
-            }
-        });
-
-
-
+//        mActionBar = getSupportActionBar();
         scaleGD = new ScaleGestureDetector(this, new simpleOnScaleGestureListener());
         mLyrics.setOnTouchListener(new View.OnTouchListener() {
 
@@ -209,19 +153,16 @@ public class show extends ActionBarActivity {
                 }else{ //when 2 pointers are present
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            // Disallow ScrollView to intercept touch events.
                             v.getParent().requestDisallowInterceptTouchEvent(true);
                             scaleGD.onTouchEvent(event);
                             break;
 
                         case MotionEvent.ACTION_MOVE:
-                            // Disallow ScrollView to intercept touch events.
                             v.getParent().requestDisallowInterceptTouchEvent(true);
                             scaleGD.onTouchEvent(event);
                             break;
 
                         case MotionEvent.ACTION_UP:
-                            // Allow ScrollView to intercept touch events.
                             v.getParent().requestDisallowInterceptTouchEvent(false);
                             break;
                     }
@@ -230,16 +171,12 @@ public class show extends ActionBarActivity {
             }
         });
 
-
         mLyrics.setText("");
-
 
         mTask  = new GetLyrics(this,getIntent());
         mTask.execute();
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        mReceiver = new UpdateView(this,mTask);
-//        mTask.execute();
+        getSupportActionBar().hide();
 
     }
 
@@ -247,32 +184,12 @@ public class show extends ActionBarActivity {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            /*float size = mLyrics.getTextSize();
-            float factor = detector.getScaleFactor();
-            int increase = 0;
-            if(factor > 1.0f)
-                increase = 2;
-            else if(factor < 1.0f)
-                increase = -2;
 
-            size += increase;
-
-            mLyrics.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
-//            mLyrics.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            //remembering the favourable text size
-
-            return true;*/
             float size = mLyrics.getTextSize();
             Log.d("TextSizeStart", String.valueOf(size));
 
             float factor = detector.getScaleFactor();
             Log.d("Factor", String.valueOf(factor));
-
 
             float product = size*factor;
             Log.d("TextSize", String.valueOf(product));
@@ -291,8 +208,8 @@ public class show extends ActionBarActivity {
         this.track = track;
         this.id = id;
 
-        mActionBar.setTitle(artist);
-        mActionBar.setSubtitle(track);
+//        mActionBar.setTitle(artist);
+//        mActionBar.setSubtitle(track);
 
         if(lyrics.equals("No Internet connection")) {
             AlertDialog.Builder mNoConnectionError = new AlertDialog.Builder(this);
@@ -309,39 +226,35 @@ public class show extends ActionBarActivity {
 
             AlertDialog.Builder mWarning = new AlertDialog.Builder(this);
             mWarning.setTitle("Cannot find lyrics");
-            mWarning.setMessage("Cannot find the lyrics.\nPlease fill track and artist name manually.");
-            mWarning.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+            mWarning.setMessage("Do you want to search manually?");
+            mWarning.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                 startActivity(intent);
-//                finish();
-
                 }
             });
 
-            mWarning.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            mWarning.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-
+                    finish();
                 }
             });
+            mWarning.setCancelable(true);
+
             mWarning.show();
 
             fail.setText("\n\n\nLyrics not found.\ntry searching manually.");
 
-        }
-        else {
-
+        } else {
             invalidateOptionsMenu();
-            mLyrics.setText(lyrics);
+            String l = "<pre><b>"+track.trim()+"</b><br /><i>"+artist.trim()+"</i><br /><br />"+lyrics+"</pre>";
+            mLyrics.setText(Html.fromHtml(l));
             this.lyrics = lyrics;
         }
-
         mButtonDone.setVisibility(View.GONE);
-
     }
-
 
     public static String getHash(String artist, String track){
         return Integer.toString((artist+track).hashCode());
@@ -351,79 +264,50 @@ public class show extends ActionBarActivity {
         SONGHASH = getHash(artist,track);
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
-
 
             if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
                 mTask = new GetLyrics(this, getIntent());
                 mTask.execute();
             }
 
-//        isNewIntent = false;
-
-//        registerReceiver( mReceiver ,
-//                new IntentFilter("com.akash.lyrics.update"));
     }
-
-
-
 
     @Override
     protected void onPause() {
 
         super.onPause();
 
-
         if (mTask.getStatus() == AsyncTask.Status.RUNNING) {
             mTask.cancel(true);
         }
-
-//        isNewIntent=false;
-
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
         setIntent(intent);
 
-//        isNewIntent = true;
-
-//        setHash(intent.getStringExtra("artist"),intent.getStringExtra("track"));
-//        mSearched = getIntent().getBooleanExtra("searched", false);
-//        new GetLyrics(this,intent).execute();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        unregisterReceiver(mReceiver);
     }
 
 //////////////////// menu /////////////////////
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);//Menu Resource, Menu
 
         return true;
-
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
-//        if(mySharedPref.getBoolean("hide_notification",false)) {
-//            menu.findItem(R.id.item6).setTitle("Show Notification");
-//        }else {
-//            menu.findItem(R.id.item6).setTitle("Hide Notification");
-//        }
 
         if(mLyrics.getText().toString().length() == 0) {
             menu.findItem(R.id.item2).setEnabled(false);
@@ -432,17 +316,10 @@ public class show extends ActionBarActivity {
             menu.findItem(R.id.item2).setEnabled(true);
         }
 
-//        if(mySharedPref.getString("theme","light").equals("dark")) {
-//            menu.findItem(R.id.item4).setTitle("Light Theme");
-//        }
-
         if(mTask.getStatus() == AsyncTask.Status.RUNNING){
             menu.findItem(R.id.item1).setVisible(false);
             menu.findItem(R.id.item2).setVisible(false);
-//            menu.findItem(R.id.item4).setVisible(false);
-
         }
-
 //        if(mySharedPref.getBoolean("playing", false)){
             menu.findItem(R.id.item9).setVisible(true);
 //        }
@@ -462,12 +339,13 @@ public class show extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent in;
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
                 return true;
+
             case R.id.item1:
-//                lockUnlock(false,mLyrics.getText().toString());
                 mSetEditorVisible();
                 return true;
 
@@ -501,53 +379,10 @@ public class show extends ActionBarActivity {
                 finish();
                 System.exit(0);
                 return true;
-//
-//            case R.id.item4:
-//                SharedPreferences.Editor ed = mySharedPref.edit();
-//                if(mySharedPref.getString("theme","light").equals("dark")) {
-//                     ed.putString("theme", "light");
-//                }
-//                else {
-//                    ed.putString("theme", "dark");
-//                }
-//                ed.apply();
-//                invalidateOptionsMenu();
-//                Bundle bundle = getIntent().getExtras();
-//                starterIntent.putExtras(bundle);
-//                finish();
-//                startActivity(starterIntent);
-//                return true;
-
-//            case R.id.item5:
-//                Intent in = new Intent(this, AboutApp.class);
-//                startActivity(in);
-//                return true;
-
-//            case R.id.item6:
-//                ed = mySharedPref.edit();
-//                if(mySharedPref.getBoolean("hide_notification",false)) {
-//                    ed.putBoolean("hide_notification", false);
-//                }
-//                else {
-//                    ed.putBoolean("hide_notification", true);
-//                    notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-//                    notificationManager.cancel(noteId);
-//                }
-//                ed.apply();
-//
-//                return true;
-
-            case R.id.item7:
-                Intent in;
-                in = new Intent(this, ArtistInfo.class);
-                startActivity(in);
-                return true;
 
             case R.id.item8:
                 in = new Intent(this, MainActivity.class);
-//                in.putExtra("show_")
                 startActivity(in);
-//                finish();
                 return true;
 
             case R.id.item9:
@@ -564,9 +399,7 @@ public class show extends ActionBarActivity {
 
                 } else {
 
-
                     mLyricsEditor.putString(SONGHASH,lyrics);
-//                    Log.w("artist - track ",artist+track);
                     mLyricsEditor.commit();
 
                 }
@@ -576,6 +409,5 @@ public class show extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
 }

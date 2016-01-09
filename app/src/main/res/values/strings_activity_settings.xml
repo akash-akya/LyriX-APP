@@ -16,7 +16,7 @@
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">
-        <item>Light Theme Dark ActionBar</item>
+        <item>Light Theme</item>
         <item>Dark Theme</item>
     </string-array>
     <string-array name="pref_example_list_values">

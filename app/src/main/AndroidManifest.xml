@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.akash.getlyrics" >
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -26,10 +27,6 @@
         <activity
             android:name=".SettingsActivity"
             android:label="Settings">
-        </activity>
-        <activity
-            android:name=".ArtistInfo"
-            android:label="@string/title_activity_artist_info">
         </activity>
         <activity
             android:name=".TrackListView"
